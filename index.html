@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta name="google-site-verification" content="Oegka8dl8JLR0R6Yb2_dDpkOpxY5RcHhriAhfYMAlIA" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranniti — Premium Learning Console</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="authOverlay" class="auth-overlay">
+        <div id="loginCard" class="auth-card">
+            <i class="fa-solid fa-chess-knight" style="font-size: 50px; color: var(--primary); margin-bottom: 20px;"></i>
+            <h2 ondblclick="adminDirectLogin()">Welcome to Ranniti</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Login to access your personalized learning console</p>
+           <input type="email" id="loginEmail" placeholder="अपना ईमेल (Email) दर्ज करें" required>
+           <button class="btn-primary" id="loginBtn" onclick="sendMagicLink()">लॉगिन लिंक भेजें 🚀</button>
+            <div class="auth-actions">
+                <p class="auth-toggle" onclick="toggleAuthMode()">New Student? Create Professional Profile</p>
+                <p class="skip-link" onclick="skipToGuest()">Skip & Explore as Guest</p>
+                
+            </div>
+        </div>
+
+        <div id="registerCard" class="auth-card" style="display: none; max-width: 750px; text-align: left;">
+            <h2 style="text-align: center; margin-bottom: 5px;"><i class="fa-solid fa-user-graduate" style="color: var(--primary);"></i> Student Dossier Registry</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">Build your professional study profile</p>
+            
+            <div class="form-grid">
+                <input type="text" id="regFirstName" placeholder="First Name *" oninput="capitalizeName(this)">
+                <input type="text" id="regLastName" placeholder="Last Name *" oninput="capitalizeName(this)">
+                
+                <select id="regGender">
+                    <option value="" disabled selected>Gender *</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input type="date" id="regDob" title="Date of Birth *">
+                
+                <select id="regQualification">
+                    <option value="" disabled selected>Highest Qualification *</option>
+                    <option value="10th Pass">10th Pass</option>
+                    <option value="12th Pass">12th Pass</option>
+                    <option value="Graduate">Graduate</option>
+                    <option value="Post Graduate">Post Graduate</option>
+                </select>
+                <select id="regPursuing">
+                    <option value="None">Pursuing Currently? (None)</option>
+                    <option value="B.A.">B.A.</option>
+                    <option value="B.Sc.">B.Sc.</option>
+                    <option value="B.Tech / B.E.">B.Tech / B.E.</option>
+                    <option value="B.Com">B.Com</option>
+                    <option value="Other">Other</option>
+                </select>
+                
+                <input type="text" id="regDiploma" placeholder="Diploma / Extra Skill (Optional)" style="grid-column: span 2;">
+                
+                <input type="number" id="regPincode" placeholder="Pincode *" onkeyup="fetchLocationByPincode(this.value, 'regLocation')">
+                <input type="text" id="regLocation" placeholder="State & District (Auto-fill)" readonly style="background: var(--bg-color);">
+                
+                <select id="regTimeline">
+                    <option value="" disabled selected>Target Exam Timeline *</option>
+                    <option value="6 Months">6 Months</option>
+                    <option value="1 Year">1 Year</option>
+                    <option value="1.5 Years">1.5 Years</option>
+                    <option value="2 Years">2 Years</option>
+                    <option value="3 Years">3 Years</option>
+                </select>
+                <input type="text" id="regDesignation" placeholder="Future Designation (e.g. Future Inspector) *">
+                
+                <input type="number" id="regPhone" placeholder="Mobile Number (Optional)">
+                <input type="email" id="regEmail" placeholder="Email Address *">
+                <input type="password" id="regPassword" placeholder="Create Password *" style="grid-column: span 2;">
+            </div>
+            <button class="btn-primary" style="margin-top: 25px;" onclick="registerUser()">Activate Professional Profile</button>
+            <p class="auth-toggle" style="text-align:center; margin-top:15px;" onclick="toggleAuthMode()">Already registered? Return to Login</p>
+            <p class="skip-link" style="text-align:center; margin-top:5px; font-weight:bold;" onclick="skipToGuest()">Skip & Explore as Guest</p>
+        </div>
+    </div>
+
+    <div id="editProfileOverlay" class="auth-overlay" style="display: none; z-index: 10001;">
+        <div class="auth-card" style="max-width: 750px; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2><i class="fa-solid fa-user-pen" style="color: var(--primary);"></i> Update Profile</h2>
+                <button style="background: transparent; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted);" onclick="closeEditProfile()">✕</button>
+            </div>
+            
+            <div class="form-grid">
+                <input type="text" id="editFirstName" placeholder="First Name *" oninput="capitalizeName(this)">
+                <input type="text" id="editLastName" placeholder="Last Name *" oninput="capitalizeName(this)">
+                <select id="editGender"><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select>
+                <input type="date" id="editDob" title="Date of Birth">
+                <select id="editQualification"><option value="10th Pass">10th Pass</option><option value="12th Pass">12th Pass</option><option value="Graduate">Graduate</option><option value="Post Graduate">Post Graduate</option></select>
+                <select id="editPursuing"><option value="None">None</option><option value="B.A.">B.A.</option><option value="B.Sc.">B.Sc.</option><option value="B.Tech / B.E.">B.Tech / B.E.</option><option value="B.Com">B.Com</option><option value="Other">Other</option></select>
+                <input type="text" id="editDiploma" placeholder="Diploma / Extra Skill" style="grid-column: span 2;">
+                <input type="number" id="editPincode" placeholder="Pincode *" onkeyup="fetchLocationByPincode(this.value, 'editLocation')">
+                <input type="text" id="editLocation" placeholder="State & District" readonly style="background: var(--bg-color);">
+                <select id="editTimeline"><option value="6 Months">6 Months</option><option value="1 Year">1 Year</option><option value="1.5 Years">1.5 Years</option><option value="2 Years">2 Years</option><option value="3 Years">3 Years</option></select>
+                <input type="text" id="editDesignation" placeholder="Future Designation *">
+                <input type="number" id="editPhone" placeholder="Mobile Number">
+            </div>
+            <button class="btn-primary" style="margin-top: 25px; background: var(--success);" onclick="saveUpdatedProfile()">Save Changes</button>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="logo"><i class="fa-solid fa-chess-knight"></i> Ranniti</div>
+            <ul class="nav-links">
+                <li id="nav-home" class="active-link" onclick="switchTab('home')"><i class="fa-solid fa-house"></i> Dashboard</li>
+                <li id="nav-material" onclick="switchTab('material')"><i class="fa-solid fa-book-bookmark"></i> Library</li>
+                <li id="nav-jobs" onclick="switchTab('jobs')">
+    <i class="fa-solid fa-bullhorn"></i> Jobs Center 
+    <span id="jobBadge" style="background:var(--danger); color:white; font-size:11px; padding:2px 8px; border-radius:12px; margin-left:5px; font-weight:800; display:none; box-shadow: 0 0 5px rgba(239, 68, 68, 0.5);">New</span>
+</li>
+                <li id="nav-profile" onclick="switchTab('profile')"><i class="fa-solid fa-user"></i> Profile</li>
+                <li id="nav-settings" onclick="switchTab('settings')"><i class="fa-solid fa-gear"></i> Settings</li>
+                <li id="nav-admin" onclick="switchTab('admin')" style="display: none;"><i class="fa-solid fa-shield-halved"></i> Admin Console</li>
+            </ul>
+        </div>
+        <div class="nav-right">
+            <div class="user-info" onclick="switchTab('profile')">
+                <div class="user-name" id="displayUserName">Guest</div>
+                <div class="user-desig" id="displayUserDesig">Exploring Ranniti</div>
+            </div>
+            <div class="avatar" id="displayUserAvatar" onclick="switchTab('profile')">G</div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+
+        <div id="homePanel" class="section-panel active-panel">
+            <div class="dash-header" style="margin-bottom: 30px;">
+                <h1 id="welcomeText">Welcome back 👋</h1>
+                <p style="color: var(--text-muted); font-weight: 600;">Stay focused.</p>
+            </div>
+            
+            <div class="three-cards-grid" id="dashboardGrid">
+                <div class="main-card active-card" id="mc-book" onclick="openModule('book')"><div class="mc-icon" style="background:#e0e7ff; color:#4f46e5;"><i class="fa-solid fa-book-open"></i></div><div class="mc-title">Smart Book</div></div>
+                <div class="main-card" id="mc-mock" onclick="openModule('mock')"><div class="mc-icon" style="background:#dcfce7; color:#16a34a;"><i class="fa-solid fa-laptop-file"></i></div><div class="mc-title">Mock Test</div></div>
+                <div class="main-card" id="mc-calc" onclick="openModule('calc')"><div class="mc-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-bolt"></i></div><div class="mc-title">Speed Math</div></div>
+                <div class="main-card" id="mc-doubt" onclick="openModule('doubt')"><div class="mc-icon" style="background:#fce7f3; color:#db2777;"><i class="fa-solid fa-camera"></i></div><div class="mc-title">Doubt Solver</div></div>
+                <div class="main-card" id="mc-analytics" onclick="openModule('analytics')"><div class="mc-icon" style="background:#f3e8ff; color:#9333ea;"><i class="fa-solid fa-chart-pie"></i></div><div class="mc-title">Analytics</div></div>
+                <div class="main-card" id="mc-planner" onclick="openModule('planner')"><div class="mc-icon" style="background:#ffedd5; color:#ea580c;"><i class="fa-solid fa-calendar-check"></i></div><div class="mc-title">Daily Sankalp</div></div>
+            </div>
+
+            <div id="module-book" class="dash-module" style="display: block;">
+                <div class="tracker-app-header" style="margin-bottom: 20px;">
+                    <div class="tracker-tabs">
+                        <button class="t-tab active" onclick="switchTrackerSubj('Math')">Mathematics</button>
+                        <button class="t-tab" onclick="switchTrackerSubj('Reasoning')">Reasoning</button>
+                        <button class="t-tab" onclick="switchTrackerSubj('English')">English</button>
+                        <button class="t-tab" onclick="switchTrackerSubj('GK')">Gen. Knowledge</button>
+                    </div>
+                </div>
+                <div class="search-bar" style="margin-bottom: 20px;">
+                    <input type="text" id="searchInput" placeholder="Search Chapters or Topics...">
+                </div>
+                <div class="chapters-grid" id="chaptersGrid"></div>
+            </div>
+
+            <div id="module-mock" class="dash-module" style="display: none;">
+                <h2 style="margin-bottom:20px;"><i class="fa-solid fa-laptop-file" style="color:#16a34a;"></i> Mock Test Simulator</h2>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px;">
+                    <select id="mockTargetExam" style="flex:1; padding:12px; border-radius:8px; border:2px solid #ea580c; font-weight:bold; font-size:15px; color:#ea580c;">
+                        <option value="">🎯 1. Select Exam</option>
+                        <option value="SSC CGL">SSC CGL</option>
+                        <option value="SSC CHSL">SSC CHSL</option>
+                        <option value="SSC MTS">SSC MTS</option>
+                        <option value="SSC GD">SSC GD</option>
+                        <option value="Railway NTPC">Railway NTPC</option>
+                        <option value="Railway ALP">Railway ALP / Tech</option>
+                    </select>
+
+                    <select id="mockTargetSubject" style="flex:1; padding:12px; border-radius:8px; border:2px solid var(--border); font-weight:bold; font-size:15px; color:var(--secondary);">
+                        <option value="All">📚 2. All Subjects (Full Test)</option>
+                        <option value="Math">🧮 Mathematics</option>
+                        <option value="Reasoning">🧠 Reasoning</option>
+                        <option value="English">🇬🇧 English</option>
+                        <option value="GK">🌍 GK / GS</option>
+                    </select>
+
+                    <select id="mockTargetMedium" style="flex:1; padding:12px; border-radius:8px; border:2px solid var(--primary); color:var(--primary); font-weight:bold; font-size:15px;">
+                        <option value="Hindi">🔴 3. Hindi Medium</option>
+                        <option value="English">🔵 3. English Medium</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="startFullMockTest()" style="background:#ea580c; border:none; width:100%; padding:15px; border-radius:8px; font-size:16px; font-weight:800; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.3); transition:0.2s;"><i class="fa-solid fa-rocket"></i> Start Exam</button>
+                <div id="mockQuestionArea"><p style="text-align:center; padding:30px; border:2px dashed var(--border); border-radius:10px; color:var(--text-muted);">Select parameters to start test.</p></div>
+            </div>
+
+            <div id="module-calc" class="dash-module" style="display: none;">
+                <h2 style="margin-bottom:20px;"><i class="fa-solid fa-bolt" style="color:#d97706;"></i> Speed Math & Calc Engine</h2>
+                <div id="calcSetup" style="text-align:center;">
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                            <select id="mathOp" style="padding:10px; border-radius:8px; border:2px solid var(--primary); font-weight:bold; flex:1;">
+                                <option value="+">Addition (+)</option>
+                                <option value="-">Subtraction (-)</option>
+                                <option value="*">Multiplication (×)</option>
+                                <option value="/">Division (÷)</option>
+                                <option value="sq">Squares (x²)</option>
+                                <option value="cb">Cubes (x³)</option>
+                                <option value="sqrt">Square Roots (√x)</option>
+                                <option value="perc">Percentages (%)</option>
+                                <option value="bodmas">BODMAS (Rule)</option>
+                                <option value="frac">Fractions (p/q)</option>
+                            </select>
+
+                            <select id="mathLevelSelect" onchange="manualLevelChange()" style="padding:10px; border-radius:8px; border:2px solid #ea580c; color:#ea580c; font-weight:bold; flex:1; background:#fff7ed;">
+                                <option value="Auto">🚀 Auto Level-Up</option>
+                                <option value="1">🟢 Level 1 (Easy)</option>
+                                <option value="2">🟡 Level 2 (Medium)</option>
+                                <option value="3">🔴 Level 3 (Hard)</option>
+                            </select>
+                        </div>
+                    <button class="btn-primary" style="width:auto; margin:0 auto;" onclick="startMathGame()">Start 15s Challenge</button>
+                </div>
+                <div id="mathGame" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-size:18px; font-weight:bold; background:var(--bg-color); padding:15px; border-radius:12px;">
+                        <span style="color:var(--danger);">⏳ <span id="mathTime">15</span>s</span>
+                        <span style="color:var(--success);">🎯 Score: <span id="mathScore">0</span></span>
+                        <button class="btn-primary" style="background:var(--danger); width:auto; padding:5px 15px;" onclick="stopMathGame()">Stop</button>
+                    </div>
+                    <div id="mathQuestion" style="font-size:40px; text-align:center; margin-bottom:30px; font-weight:800; color:var(--primary);">Wait..</div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;" id="mathOptionsGrid"></div>
+                </div>
+            </div>
+
+            <div id="module-doubt" class="dash-module" style="display: none; text-align: center; padding: 50px;">
+                <i class="fa-solid fa-camera" style="font-size: 50px; color: #db2777; margin-bottom: 20px;"></i>
+                <h2>AI Doubt Solver</h2>
+                <p style="color: var(--text-muted);">Upload a photo of your question to get instant step-by-step solutions.</p>
+                <button class="btn-primary" style="width:auto; margin:20px auto;" onclick="alert('Camera integration pending.')">Upload Image</button>
+            </div>
+
+            <div id="module-analytics" class="dash-module" style="display: none;">
+                <div id="analyticsContent"></div>
+<div style="background: white; padding: 25px; border-radius: 16px; box-shadow: var(--card-shadow); margin-top: 25px; border: 2px solid #ea580c;">
+                <h3 style="color: #ea580c; margin-bottom: 10px;"><i class="fa-solid fa-stopwatch"></i> All India Live Mock Test Center</h3>
+                <p style="color: var(--text-muted); margin-bottom: 20px; font-weight: 600;">Attempt real exam patterns with timer and negative marking.</p>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px;">
+                    <select id="mockTargetExam" style="flex:1; padding:12px; border-radius:8px; border:2px solid #ea580c; font-weight:bold; font-size:15px; color:#ea580c;">
+                        <option value="">🎯 1. Select Exam</option>
+                        <option value="SSC CGL">SSC CGL (Graduate Level)</option>
+                        <option value="SSC CHSL">SSC CHSL (12th Level)</option>
+                        <option value="SSC MTS">SSC MTS (10th Level)</option>
+                        <option value="Railway NTPC">Railway NTPC</option>
+                        <option value="Railway ALP">Railway ALP / Tech</option>
+                    </select>
+
+                    <select id="mockTargetSubject" style="flex:1; padding:12px; border-radius:8px; border:2px solid var(--border); font-weight:bold; font-size:15px; color:var(--secondary);">
+                        <option value="All">📚 2. Full Mock Test (All Subjects)</option>
+                        <option value="Math">🧮 Mathematics</option>
+                        <option value="Reasoning">🧠 Reasoning</option>
+                        <option value="English">🇬🇧 English</option>
+                        <option value="GK">🌍 GK / GS</option>
+                    </select>
+
+                    <select id="mockTargetMedium" style="flex:1; padding:12px; border-radius:8px; border:2px solid var(--primary); color:var(--primary); font-weight:bold; font-size:15px;">
+                        <option value="Hindi">🔴 3. Hindi Medium</option>
+                        <option value="English">🔵 3. English Medium</option>
+                    </select>
+                </div>
+                
+                <button class="btn-primary" onclick="startFullMockTest()" style="background:#ea580c; border:none; width:100%; padding:15px; border-radius:8px; font-size:16px; font-weight:800; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.3); transition:0.2s;"><i class="fa-solid fa-laptop-code"></i> Start Online Exam</button>
+            </div>
+            </div>
+
+            <div id="module-planner" class="dash-module" style="display: none;">
+                <h2 style="margin-bottom:20px;"><i class="fa-solid fa-calendar-check" style="color:#ea580c;"></i> Daily Sankalp (Study Streak)</h2>
+                <div style="background:var(--bg-color); padding:15px; border-radius:10px; border:1px solid var(--border); margin-bottom:15px;">
+                    <button class="btn-primary" style="width:auto;" onclick="generateDailyPlan()">Generate Today's Plan</button>
+                </div>
+                <div id="plannerList"></div>
+            </div>
+        </div>
+
+        <div id="subtopicSelectionPanel" class="section-panel">
+            <div class="page-header" style="display:flex; align-items:center; gap:15px; margin-bottom:30px; border-bottom:2px solid var(--border); padding-bottom:15px;">
+                <button onclick="switchTab('home')" style="background:var(--bg-color); border:1px solid var(--border); padding:8px 15px; border-radius:8px; cursor:pointer; font-weight:bold;"><i class="fa-solid fa-arrow-left"></i> Back to Chapters</button>
+                <div>
+                    <div id="pageChapterNum" style="font-size:12px; color:var(--text-muted); font-weight:800; text-transform:uppercase;"></div>
+                    <h2 id="pageChapterTitle" style="color:var(--secondary);"></h2>
+                </div>
+            </div>
+            <div id="subtopicListArea"></div>
+        </div>
+        <div id="practicePanel" class="section-panel">
+            <div class="page-header" style="display:flex; align-items:center; gap:15px; margin-bottom:30px; border-bottom:2px solid var(--border); padding-bottom:15px;">
+                <button onclick="goBackToSubtopics()" style="background:var(--bg-color); border:1px solid var(--border); padding:8px 15px; border-radius:8px; cursor:pointer; font-weight:bold;"><i class="fa-solid fa-arrow-left"></i> Back to Topics</button>
+                <h2 style="color:var(--success);">✍️ Practice Engine</h2>
+            </div>
+            <h3 id="practiceTitle" style="margin-bottom: 20px; font-size: 22px;"></h3>
+            
+            <div style="background:var(--white); padding:20px; border-radius:16px; border:1px solid var(--border); box-shadow:var(--card-shadow); margin-bottom:30px;">
+                <p style="font-weight:800; margin-bottom:15px; color:var(--secondary);">Select Difficulty Level to Load Questions:</p>
+                <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                    <button style="flex:1; padding:15px; border-radius:8px; border:2px solid var(--success); background:var(--white); color:var(--success); font-weight:800; cursor:pointer;" onclick="loadPracticePageQuestions('Easy')">🟩 Easy (50 Qs)</button>
+                    <button style="flex:1; padding:15px; border-radius:8px; border:2px solid var(--warning); background:var(--white); color:var(--warning); font-weight:800; cursor:pointer;" onclick="loadPracticePageQuestions('Moderate')">🟨 Moderate (100 Qs)</button>
+                    <button style="flex:1; padding:15px; border-radius:8px; border:2px solid var(--danger); background:var(--white); color:var(--danger); font-weight:800; cursor:pointer;" onclick="loadPracticePageQuestions('Hard')">🟥 Hard (150 Qs)</button>
+                </div>
+            </div>
+            <div id="practiceQuestionArea"></div>
+        </div>
+
+        <div id="materialPanel" class="section-panel">
+            <div class="tracker-tabs" style="margin-bottom:20px; flex-wrap:wrap;">
+                <button class="t-tab active" onclick="switchLibraryTab('syllabus')">Syllabus</button>
+                <button class="t-tab" onclick="switchLibraryTab('ncert')">NCERT (6-12)</button>
+                <button class="t-tab" onclick="switchLibraryTab('papers')">Old Question Papers</button>
+                <button class="t-tab" onclick="switchLibraryTab('roadmap')">Success Roadmap</button>
+<button class="t-tab" style="background:#fef3c7; color:#d97706; border-color:#fde68a;" onclick="openRevisionBook()"><i class="fa-solid fa-bookmark"></i> My Revision Book</button>
+                <button class="t-tab" onclick="switchLibraryTab('revision')">Revision Book</button>
+            </div>
+            <div id="lib-syllabus" class="lib-content active-lib"><div class="lib-placeholder"><p>Syllabus PDFs will appear here.</p></div></div>
+            <div id="lib-ncert" class="lib-content" style="display:none;"><div class="lib-placeholder"><p>NCERT Digital Books repository.</p></div></div>
+            <div id="lib-papers" class="lib-content" style="display:none;"><div class="lib-placeholder"><p>Old Papers format.</p></div></div>
+            <div id="lib-roadmap" class="lib-content" style="display:none;"><div class="lib-placeholder"><p>Step-by-Step Success Roadmap Tracker.</p></div></div>
+            <div id="lib-revision" class="lib-content" style="display:none;"><div class="lib-placeholder"><p>Saved questions for quick revision.</p></div></div>
+        </div>
+
+        <div id="jobsPanel" class="section-panel">
+            <div class="tracker-tabs" style="margin-bottom:20px;">
+                <button class="t-tab active" onclick="switchJobsTab('alerts')">Smart Job Alerts</button>
+                <button class="t-tab" onclick="switchJobsTab('applied')">My Applied Forms</button>
+            </div>
+            <div id="jobs-alerts" class="jobs-content active-jobs">
+                <div class="sarkari-board-grid">
+                    <div class="sarkari-col"><div class="sarkari-col-header" style="background:#2563eb;">Eligible Latest Jobs</div><div id="sarkariJobsList"></div></div>
+                    <div class="sarkari-col"><div class="sarkari-col-header" style="background:#059669;">Admit Cards & Notifications</div><div id="sarkariAdmitList"></div></div>
+                </div>
+            </div>
+            <div id="jobs-applied" class="jobs-content" style="display:none;">
+                <div style="background: var(--white); padding: 20px; border-radius: 12px; border: 1px dashed var(--border); text-align: center; margin-bottom: 20px;">
+                    <button class="btn-primary" style="width:auto; margin: 0 auto;" onclick="addAppliedFormPrompt()">+ Add New Applied Form</button>
+                </div>
+                <div id="appliedFormsList"></div>
+            </div>
+        </div>
+
+        <div id="profilePanel" class="section-panel">
+            <div class="settings-wrapper" style="max-width:900px; margin:0 auto;">
+                <div style="text-align:center; margin-bottom:30px; position:relative;">
+                    <div style="position: relative; width: 130px; height: 130px; margin: 0 auto 15px auto;">
+                        <div class="avatar" style="width:100%; height:100%; font-size:50px; box-shadow:var(--card-shadow);" id="profAvatar">G</div>               
+                    </div>
+                    <h2 id="profFullName" style="font-size:28px; font-weight:800; color:var(--secondary);">Guest User</h2>
+                    <p id="profDesignation" style="color:var(--primary); font-weight:700; margin-bottom: 15px; font-size:16px;">Future Achiever</p>
+                    
+                    <div style="display:flex; justify-content:center; gap:15px; margin-bottom:20px;">
+                        <div style="background:rgba(16, 185, 129, 0.1); color:#047857; padding:8px 20px; border-radius:20px; font-size:14px; font-weight:800; border:1px solid #a7f3d0;"><i class="fa-solid fa-stopwatch"></i> Today's Study: <span id="profStudyTime">0m</span></div>
+                        <button style="background:var(--secondary); color:white; padding:8px 20px; border-radius:20px; font-size:14px; font-weight:800; border:none; cursor:pointer;" onclick="openEditProfile()"><i class="fa-solid fa-pen-to-square"></i> Edit Profile</button>
+                    </div>
+                </div>
+
+                <div class="settings-group" style="background:var(--white); border-radius:20px; border:1px solid var(--border); box-shadow: var(--card-shadow); padding: 30px;">
+                    <h3 style="margin-bottom: 25px; border-bottom: 2px solid var(--border); padding-bottom: 15px; color:var(--primary);"><i class="fa-solid fa-id-card-clip"></i> Complete Student Dossier</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                        <div><p style="font-size:12px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Email Address</p><p style="font-weight:800; color:var(--secondary); font-size:15px;" id="profEmail">N/A</p></div>
+                        <div><p style="font-size:12px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Mobile Number</p><p style="font-weight:800; color:var(--secondary); font-size:15px;" id="profPhone">N/A</p></div>
+                        <div><p style="font-size:12px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Gender</p><p style="font-weight:800; color:var(--secondary); font-size:15px;" id="profGender">N/A</p></div>
+                        <div><p style="font-size:12px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Date of Birth</p><p style="font-weight:800; color:var(--secondary); font-size:15px;" id="profDob">N/A</p></div>
+                        <div><p style="font-size:12px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Highest Qualification</p><p style="font-weight:800; color:var(--secondary); font-size:15px;" id="profQual">N/A</p></div>
+                        <div><p style="font-size:12px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Currently Pursuing</p><p style="font-weight:800; color:var(--secondary); font-size:15px;" id="profPursuing">N/A</p></div>
+                        <div><p style="font-size:12px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Diploma / Extra Skill</p><p style="font-weight:800; color:var(--secondary); font-size:15px;" id="profDiploma">N/A</p></div>
+                        <div><p style="font-size:12px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Target Timeline</p><p style="font-weight:800; color:var(--secondary); font-size:15px;" id="profTimeline">N/A</p></div>
+                        <div style="grid-column: span 2;"><p style="font-size:12px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Current Location</p><p style="font-weight:800; color:var(--secondary); font-size:15px;" id="profLocation">N/A</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="settingsPanel" class="section-panel">
+            <div class="settings-wrapper" style="max-width:800px; margin:0 auto;">
+                <h2 style="margin-bottom: 30px; text-align: center;">App Settings</h2>
+                <div class="settings-group" style="background:var(--white); border-radius:16px; border:1px solid var(--border); box-shadow: var(--card-shadow); margin-bottom: 25px;">
+                    <div class="setting-row">
+                        <div class="set-label"><i class="fa-solid fa-language"></i> Study Medium</div>
+                        <select id="settingsMedium" class="medium-selector" onchange="changeGlobalMedium()" style="padding:8px 12px; border:2px solid var(--border); border-radius:8px; width:auto; cursor:pointer;">
+                            <option value="Bilingual">Bilingual</option><option value="English">English</option><option value="Hindi">Hindi</option>
+                        </select>
+                    </div>
+                    <div class="setting-row">
+                        <div class="set-label"><i class="fa-solid fa-moon"></i> Dark Mode Interface</div>
+                        <label class="switch"><input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()"><span class="slider"></span></label>
+                    </div>
+                    <div class="setting-row">
+                        <div class="set-label"><i class="fa-solid fa-calendar-days"></i> Enable Daily Sankalp (Calendar)</div>
+                        <label class="switch"><input type="checkbox" id="calendarToggle" checked onchange="toggleCalendar()"><span class="slider"></span></label>
+                    </div>
+                </div>
+                <div class="settings-group" style="background:var(--white); border-radius:16px; border:1px solid var(--border); box-shadow: var(--card-shadow);">
+                    <div class="setting-row clickable" onclick="alert('Feedback form will open here.')"><div class="set-label"><i class="fa-solid fa-comment-dots"></i> Submit Feedback / Report Bug</div><i class="fa-solid fa-chevron-right"></i></div>
+                    <div class="setting-row clickable" onclick="alert('Ranniti Version 1.0 - The Ultimate Learning Ecosystem.')"><div class="set-label"><i class="fa-solid fa-circle-info"></i> About Us</div><i class="fa-solid fa-chevron-right"></i></div>
+                </div>
+                <button class="btn-primary" style="background:var(--danger); width:auto; margin: 30px auto; display: block; padding: 12px 30px;" onclick="logoutUser()">Log Out from Ranniti</button>
+            </div>
+        </div>
+
+        <div id="adminPanel" class="section-panel">
+            <h2 style="margin-bottom:20px;"><i class="fa-solid fa-user-shield"></i> Admin Control Center</h2>
+            
+            <div style="background: #eff6ff; border: 2px solid #bfdbfe; padding: 25px; border-radius: 16px; margin-bottom: 25px; box-shadow: var(--card-shadow);">
+                <h3 style="color: #1d4ed8; margin-bottom: 15px;"><i class="fa-solid fa-paper-plane"></i> Send Live Job Alert</h3>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+    <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap; width:100%;">
+        <select id="adminJobType" style="flex:1; padding:10px; border-radius:8px; border:2px solid var(--border);" onchange="toggleGovtLevel()">
+            <option value="Government">🏛️ Government Job</option>
+            <option value="Private">🏢 Private Job</option>
+        </select>
+        <select id="adminGovtLevel" style="flex:1; padding:10px; border-radius:8px; border:2px solid var(--border);">
+            <option value="Central">🇮🇳 Central Govt</option>
+            <option value="State">🚩 State Govt</option>
+        </select>
+    </div>
+                    <input type="text" id="adminJobTitle" placeholder="Job Title (e.g. 🔥 SSC GD Bumper Vacancy)" style="flex:2; padding:12px; border-radius:8px; border:2px solid #93c5fd; font-weight:700;">
+                    <input type="text" id="adminJobQual" placeholder="Qualification" style="flex:1; padding:12px; border-radius:8px; border:2px solid #93c5fd; font-weight:600;">
+                    <input type="text" id="adminJobLink" placeholder="Apply Link (https://...)" style="flex:2; padding:12px; border-radius:8px; border:2px solid #93c5fd;">
+                    <button class="btn-primary" onclick="sendAdminJobAlert()" style="background:#2563eb; width:auto; border-radius:8px;"><i class="fa-solid fa-bell"></i> Send Alert</button>
+                </div>
+            </div>
+<div id="adminActiveJobsContainer" style="background: var(--white); padding: 25px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 25px; box-shadow: var(--card-shadow);">
+                <h3 style="margin-bottom: 15px; color: var(--secondary);"><i class="fa-solid fa-list-ul" style="color: var(--primary);"></i> Manage Active Jobs</h3>
+                <div id="adminJobsList"></div>
+            </div>
+            <div class="tracker-tabs" style="margin-bottom:20px;">
+                <button class="t-tab active" onclick="document.getElementById('adminQImport').style.display='block'; document.getElementById('adminLibImport').style.display='none';">Questions Import</button>
+                <button class="t-tab" onclick="document.getElementById('adminQImport').style.display='none'; document.getElementById('adminLibImport').style.display='block';">Library Data Entry</button>
+            </div>
+            
+            <div id="adminQImport">
+                <div style="background: var(--white); padding: 30px; border-radius: 16px; border: 1px solid var(--border);">
+                    <div style="display:flex; gap:15px; margin-bottom:20px; flex-wrap:wrap;">
+                        <select id="adminSubj" style="flex:1; padding:10px; border-radius:8px; border: 2px solid var(--border);" onchange="updateAdminTopics()">
+                            <option value="Math">Mathematics</option>
+                            <option value="Reasoning">Reasoning</option>
+                            <option value="English">English</option>
+                            <option value="GK">General Knowledge</option>
+                            <option value="Mock Test">🔥 Full Mock Test Paper</option>
+                        </select>
+                        
+                        <select id="adminTopic" style="flex:1; padding:10px; border-radius:8px; border: 2px solid var(--border);" onchange="updateAdminSubtopics()">
+                            <option value="">Select Topic</option>
+                        </select>
+                        
+                        <select id="adminSubtopic" style="flex:1; padding:10px; border-radius:8px; border: 2px solid var(--border);">
+                            <option value="">Select Subtopic</option>
+                        </select>
+
+                        <select id="adminQLevel" style="flex:1; padding:10px; border-radius:8px; border: 2px solid var(--warning); color:var(--warning); font-weight:bold;">
+                            <option value="Easy">🟢 Easy (आसान)</option>
+                            <option value="Medium" selected>🟡 Medium (मध्यम)</option>
+                            <option value="Hard">🔴 Hard (कठिन)</option>
+                            <option value="Expert">🔥 Expert (एक्सपर्ट)</option>
+                        </select>
+
+                        <select id="adminQMedium" style="flex:1; padding:10px; border-radius:8px; border: 2px solid var(--primary); color:var(--primary); font-weight:bold;">
+                            <option value="Hindi">🔴 Hindi Medium</option>
+                            <option value="English">🔵 English Medium</option>
+                            <option value="Bilingual">🟣 Bilingual</option>
+                        </select>
+                    </div>
+                    <textarea id="bulkData" rows="10" placeholder="[Q_EN]: Question?\n[Q_HI]: प्रश्न?\n[A]: 1\n[B]: 2\n[C]: 3\n[D]: 4\n[ANS]: A\n[TRICK]: Solution...\n[EXAM]: LEVEL-1\n---" style="width:100%; margin-bottom:15px; padding:15px; border-radius:8px; border:2px solid var(--border);"></textarea>
+                    <button class="btn-primary" onclick="processBulkImport()">Inject Questions to Database</button>
+                </div>
+                <div id="adminQuestionList" style="margin-top:20px;"></div>
+            </div>
+            
+            <div id="adminLibImport" style="display:none;">
+                <div style="background: var(--white); padding: 30px; border-radius: 16px; border: 1px solid var(--border);">
+                    <div class="form-grid">
+                       <select id="libCategory" style="padding:10px; border-radius:8px; border:2px solid var(--border); font-weight:bold;">
+    <option value="syllabus">Syllabus (सिलेबस)</option>
+    <option value="ncert">NCERT Books (6-12)</option>
+    <option value="papers">Old Question Papers (पुराने पेपर)</option>
+    <option value="roadmap">Success Roadmap (रोडमैप)</option>
+</select>
+                        <select id="libMedium" style="padding:10px; border-radius:8px; border:2px solid var(--primary); color:var(--primary); font-weight:bold;">
+                            <option value="Hindi">🔴 Hindi Medium</option>
+                            <option value="English">🔵 English Medium</option>
+                            <option value="Bilingual">🟣 Bilingual (Both)</option>
+                        </select>
+                        <input type="text" id="libTitle" placeholder="Title (e.g. History NCERT Class 10)" style="grid-column: span 2; padding:10px; border-radius:8px; border:2px solid var(--border);">
+                        <input type="text" id="libUrl" placeholder="Google Drive / PDF Link" style="grid-column: span 2; padding:10px; border-radius:8px; border:2px solid var(--border);">
+                    </div> 
+    <button class="btn-primary" style="margin-top:20px;" onclick="addLibraryData()">Upload to Library</button>
+</div>
+    </div> <div style="margin-top: 40px; padding-top: 20px; border-top: 2px dashed var(--border);">
+        <h3 style="color: var(--danger); margin-bottom: 15px;">
+            <i class="fa-solid fa-trash-can"></i> सवालों को खोजें और डिलीट करें
+        </h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 15px;">
+            <select id="delSubject" style="padding:10px; border-radius:8px; border:1px solid var(--border);">
+                <option value="">-- Subject चुनें --</option>
+                <option value="Maths">Mathematics</option>
+                <option value="Reasoning">Reasoning</option>
+                <option value="English">English</option>
+                <option value="GK">General Knowledge</option>
+            </select>
+            <input type="text" id="delTopic" placeholder="Topic (जैसे: Number System)" style="padding:10px; border-radius:8px; border:1px solid var(--border);">
+            <input type="text" id="delSubtopic" placeholder="Subtopic (जैसे: Unit Digit)" style="padding:10px; border-radius:8px; border:1px solid var(--border);">
+        </div>
+        
+        <button class="btn-primary" onclick="searchForDelete()" style="background-color: var(--secondary); margin-bottom: 20px;">
+            सवाल खोजें 🔍
+        </button>
+
+        <div id="adminDeleteList" style="max-height: 350px; overflow-y: auto; background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 10px;">
+            <p style="color: var(--text-muted); text-align: center; margin: 20px 0;">फ़िल्टर लगाकर सवाल खोजें, रिजल्ट्स यहाँ दिखेंगे...</p>
+        </div>
+    </div>
+    </div> <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyBROlIF7-9O9nR-DehRAQTJU2ppMjoFEXE",
+        authDomain: "project-3160988131607329141.firebaseapp.com",
+        databaseURL: "https://project-3160988131607329141-default-rtdb.firebaseio.com",
+        projectId: "project-3160988131607329141",
+        storageBucket: "project-3160988131607329141.firebasestorage.app",
+        messagingSenderId: "764885439922",
+        appId: "1:764885439922:web:b981b23cd99d7e5a5540ab"
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const db = firebase.firestore();
+    </script>
+
+    <script src="script.js"></script>
+</body>
+</html>
